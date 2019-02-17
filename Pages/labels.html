@@ -1,0 +1,33 @@
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+
+<style type="text/css">
+    
+</style>
+
+<div id="labels" >
+    <ul class="Label">
+        <li v-for="pep in peps">
+            <a href="" style="color: #ffffff; text-decoration: none;">{{ pep.term }}</a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#labels',
+        created: function () {
+            this.fetchData();
+        },
+        data: {
+            peps: []
+        },
+        methods: {
+            fetchData() {
+                axios.get('https://heegreis.blogspot.com/feeds/posts/summary?alt=json&max-results=0').then(response => {
+                    this.peps = response.data.feed.category;
+                });
+            }
+        }
+    });
+</script>
