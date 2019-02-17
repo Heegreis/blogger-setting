@@ -1,0 +1,90 @@
+<!-- put it to page footer -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<style type="text/css">
+    #HTML2 {
+        position: fixed;
+        border: none;
+        right: 15px;
+        bottom: 15px;
+    }
+    #HTML2 h3{
+        display: none;
+    }
+    #gotop{
+        border-radius: 99px;
+        background-color: #010e1b;
+        background-color: rgba(1, 10, 20, 0.8);
+        width: 45px;
+        height: 45px;
+        display: block;
+        border: none;
+    }
+    .up-arrow {
+        position: relative;
+        width: 15px;
+        height: 15px;
+        border-top: 3px solid;
+        border-right: 3px solid;
+        border-color: #c7c7cc;
+        transform: rotate(-45deg);
+        left: 7px;
+        top: 5px;
+    }
+</style>
+
+<button id="gotop" v-show="visible" @click="backToTop">
+    <div class="up-arrow"></div>
+</button>
+
+<script>
+    var gotop = new Vue({
+        el: '#gotop',
+        props: {
+            text: {
+                type: String,
+                default: 'Voltar ao topo'
+            },
+            visibleoffset: {
+                type: [String, Number],
+                default: 10
+            },
+        },
+        data() {
+            return {
+                visible: false
+            }
+        },
+        mounted() {
+            window.smoothscroll = () => {
+                let currentScroll = document.documentElement.scrollTop || document.body.scrollTop
+                if (currentScroll > 0) {
+                    window.requestAnimationFrame(window.smoothscroll)
+                    window.scrollTo(0, Math.floor(currentScroll - (currentScroll / 5)))
+                }
+            }
+            window.addEventListener('scroll', this.catchScroll)
+        },
+        destroyed() {
+            window.removeEventListener('scroll', this.catchScroll)
+        },
+        methods: {
+            /**
+             * Catch window scroll event 
+             * @return {void}
+             */
+            catchScroll() {
+                this.visible = (window.pageYOffset > parseInt(this.visibleoffset))
+            },
+            /**
+             * The function who make the magics
+             * @return {void}
+             */
+            backToTop() {
+                window.smoothscroll()
+                this.$emit('scrolled');
+            }
+        }
+    });
+
+</script>
