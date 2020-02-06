@@ -1,0 +1,118 @@
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+
+<style type="text/css">
+    .cancel{
+        background-color: gray; 
+        border-radius:999em; 
+        cursor: default;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        text-align: center;
+        line-height: 11px;
+        color: white;
+    }
+    .searchBar{
+        position: relative;
+        margin-bottom: 1em;
+    }
+    .bar{
+        width: calc(100% - 4em);
+        border-style: solid;
+        border-width: thin;
+        border-top-left-radius: 1em;
+        border-bottom-left-radius: 1em;
+        border-color: gray;
+        min-height: 56px;
+    }
+    .bar .Label{
+        margin-top: 7px;
+        margin-bottom: 7px;
+    }
+    .searchBtn{
+        position: absolute;
+        right: 0;
+        top: 0;
+        display: block;
+        background-color: gray;
+        padding: 1em;
+        border-top-right-radius: 1em;
+        border-bottom-right-radius: 1em;
+        font-weight: bolder;
+        height: 56px;
+        margin-bottom: 1em;
+    }
+    .searchBtn a{
+        color: white;
+    }
+</style>
+
+<div id="labels" >
+    <div class="searchBar">
+        <div class="bar">
+            <ul class="Label">
+                <li v-for="name in checkedNames">
+                    <a href="" style="color: #ffffff; text-decoration: none;">{{ name }}</a>
+                    <div class="cancel" v-on:click="cancelCheck(name)">x</div>
+                </li>
+            </ul>
+        </div>
+        <div class="searchBtn"><a :href=labelsLink()>搜尋</a></div>
+    </div>
+    <ul class="Label">
+        <li v-for="pep in peps">
+            <input type="checkbox" :value="pep.term" v-model="checkedNames"/>
+            <a href="" style="color: #ffffff; text-decoration: none;">{{ pep.term }}</a>
+        </li>
+    </ul>
+    <!-- <div>:{{labels}}</div>
+    <div>:{{checkedNames}}</div> -->
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#labels',
+        created: function () {
+            this.fetchData();
+        },
+        data: {
+            peps: [],
+            labels: [],
+            checkedNames: [],
+        },
+        methods: {
+            fetchData() {
+                axios.get('https://heegreis.blogspot.com/feeds/posts/summary?alt=json&max-results=0').then(response => {
+                    this.peps = response.data.feed.category;
+                    this.addAttri();
+                });
+            },
+            addAttri() {
+                for (let i = 0; i < this.peps.length; i++) {
+                    this.labels.push({name:this.peps[i].term, show:'true', check:'false'});
+                }
+            },
+            cancelCheck(name) {
+                this.checkedNames.splice(this.checkedNames.indexOf(name), 1)
+            },
+            labelsLink() {
+                var labelsLink = ""
+                if (this.checkedNames.length > 0) {
+                    if (this.checkedNames.length > 1) {
+                        var labelsLink = "/search?q="
+                        for (let i = 0; i < this.checkedNames.length; i++) {
+                            labelsLink = labelsLink + "label:" + this.checkedNames[i];
+                            if (i < this.checkedNames.length -1) {
+                                labelsLink = labelsLink + "+"
+                            }
+                        }
+                    }else{
+                        var labelsLink = "/search/label/" + this.checkedNames[0]
+                    }
+                }
+                return labelsLink
+            },
+        }
+    });
+</script>
